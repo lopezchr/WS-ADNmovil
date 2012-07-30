@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+  <endpoint implementation="webServices.ADN_Query" name="ADN_Query" url-pattern="/ADN_Query"/>
+  <endpoint implementation="webServices.ADN_Mobile" name="ADN_Mobile" url-pattern="/ADN_Mobile"/>
+  <endpoint implementation="webServices.ADN_Document" name="ADN_Document" url-pattern="/ADN_Document"/>
+</endpoints>
