@@ -5,7 +5,9 @@
 package webServices;
 
 import javadocs.Madre;
+import javadocs.MadreDAO;
 import javadocs.SecurityHelper;
+import javadocs.Utils;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -25,22 +27,23 @@ public class ADN_Document {
             @WebParam(name = "user") String usuario,
             @WebParam(name = "pwd") String clave,
             @WebParam(name = "emp") String empresa,
-            @WebParam(name = "isSistema") String isSistema,
+            @WebParam(name = "ideDoc") String ideDoc,
             @WebParam(name = "document") String document,
             @WebParam(name = "hash") String hash
             ) {
-        String[] args = {usuario,clave,empresa,document};
-        String secHash = SecurityHelper.getHash(args);
+        String[] args = {usuario,clave,empresa,ideDoc,document};
+        String secHash = SecurityHelper.getDocHash(args);
         if(!secHash.equals(hash)){
             return "Error en validacion de Seguridad"; 
         }else{
             String validalogin = Madre.login(usuario, clave, empresa);
-            if(validalogin.indexOf("Error") == 0){
+            
+            if(validalogin.indexOf("Error") < 1){
                 //se extrae el idEmpresa
                 String[] res = validalogin.split("\\|");
                 String idEmpresa = res[1];
-                String idUsuario = res[0];
-                return Madre.setDocument(idEmpresa, isSistema, document);
+                return Madre.setDocument(idEmpresa, document, ideDoc);
+                
             }else{
                 return "error al validar usuario";
             }

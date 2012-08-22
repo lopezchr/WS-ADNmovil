@@ -116,7 +116,7 @@ public class MadreDAO {
     
   }
   
-  public static Object[][] funcionEDI(String documento){
+  public static Object[][] funcionEDI(String idEmpresa, String documento){
     Object resultado = "";
     CallableStatement cs= null;
     
@@ -124,20 +124,13 @@ public class MadreDAO {
 
     //functionCode = dbfunctionality.getFunctionCode(nameFunction);
     try{
-      cs = conex.prepareCall("{? = call DB (?)}");
+      cs = conex.prepareCall("{call "+idEmpresa+".CREA_DOCUM.FACT (?)}");
       cs.registerOutParameter(1, java.sql.Types.VARCHAR);
-      cs.setString(2, documento);
+      cs.setString(1, documento);
       cs.execute();
-      resultado = cs.getObject(1);
       
-       if(resultado != null){
-        res = Utils.chainToArray(resultado.toString());
-        return res;  
-      }else{
-        res[0][0] = "";
-        return res;
-      }
-      
+      res[0][0]= "ok";      
+      return res;
       
     }catch(SQLException sqle){
         res[0][0] = "WSADNMovil.Error funcionEDI: " + sqle.toString();

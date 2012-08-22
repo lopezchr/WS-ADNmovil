@@ -433,26 +433,46 @@ public class ADN_Mobile {
             return Madre.getFactDetalleArticulo(idEmpresa,idArticulo,bodega,idLista);
         }
     }
-    
     /**
      * Web service operation
      */
-    @WebMethod(operationName = "saveFactura")
-    public String saveFactura(
+    @WebMethod(operationName = "billDataValidation")
+    public String billDataValidation(
             @WebParam(name = "idEmpresa") String idEmpresa,
             @WebParam(name = "idSistema") String idSistema,
-            @WebParam(name = "idtdoc") String encabezado,
-            @WebParam(name = "bodega") String articulos,
+            @WebParam(name = "Codtdoc") String codTdoc,
+            @WebParam(name = "idccosto") String codCcosto,
+            @WebParam(name = "idvendedor") String idVendedor,
             @WebParam(name = "hash") String hash
                     ) 
     {  
         //filtro no se agrega como parametro de seguridad porque puede ser nullo
-        String[] args = {idEmpresa,idSistema,encabezado,articulos};
+        String[] args = {idEmpresa,idSistema,codTdoc,codCcosto,idVendedor};
         String secHash = SecurityHelper.getHash(args);
         if(!secHash.equals(hash)){
             return "Error en validacion de Seguridad"; 
         }else{
-            return Madre.saveFactura(idEmpresa,idSistema,encabezado,articulos);
+            return Madre.billDataValidation(idEmpresa,idSistema,codTdoc,codCcosto,idVendedor);
+        }
+    }
+    
+    /**
+     * Web service operation
+     */
+        @WebMethod(operationName = "getBillDocuments")
+    public String getBillDocuments(
+            @WebParam(name = "idEmpresa") String idEmpresa,
+            @WebParam(name = "idTercero") String idTercero,
+            @WebParam(name = "hash") String hash
+                    ) 
+    {  
+        //filtro no se agrega como parametro de seguridad porque puede ser nullo
+        String[] args = {idEmpresa,idTercero};
+        String secHash = SecurityHelper.getHash(args);
+        if(!secHash.equals(hash)){
+            return "Error en validacion de Seguridad"; 
+        }else{
+            return Madre.getBillDocuments(idEmpresa,idTercero);
         }
     }
 }

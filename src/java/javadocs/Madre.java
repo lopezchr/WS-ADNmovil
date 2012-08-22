@@ -249,7 +249,7 @@ public class Madre {
         Object[][] result = new Object[1][1];
         
         try{
-            result = MadreDAO.funcionSQLBD(idEmpresa ,"MI-01", filtro+"@#"+idSistema+"@#"+grupo+"@#");
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"MI-01", filtro+"@#"+idSistema+"@#"+grupo+"@#"+bodega+"@#");
       
             if(Utils.validaResult(result)){
           
@@ -425,7 +425,7 @@ public class Madre {
         }  
    }
    
-   public static String setDocument(String idEmpresa, String idSistema, String documento){
+   public static String setDocument(String idEmpresa, String documento, String ideDoc){
        String conec = MadreDAO.conexionDB("adn","Pzs5wlrd_", "adn");
         if(!conec.equals("ok")){
             return "Error de conexion";
@@ -433,8 +433,34 @@ public class Madre {
         Object[][] result =new Object[1][1];
         
         try{
-            String sql = "{? = call DB (?)}";
-            result = MadreDAO.funcionEDI(sql);
+            //result = MadreDAO.funcionSQLBD(idEmpresa ,"DO-01", documento+"@#");
+            result = MadreDAO.funcionEDI(idEmpresa,documento);
+            
+            if(Utils.validaResult(result)){
+                if(result[0][0].toString().indexOf("Error") < 1){
+                    Object[][] obj = MadreDAO.consultarBD("SELECT OBSER LIN FROM "+idEmpresa+".TMP_MOVIL_CONSULTAS WHERE ID_REGISTRO="+ideDoc+"");
+                    return Utils.arrayToChain(obj);
+                    //return Madre.verifyDocument(idEmpresa,ideDoc);
+                }else{
+                    return "error en la durante el envio del documento";
+                }      
+            }else{
+                return "Error al validar respuesta del procedimiento DB.@#";
+            }   
+        }catch(Exception e){
+            return "Error durante la generacion del documento: "+e.toString()+"@#";
+        }  
+   }
+   
+   public static String verifyDocument(String idEmpresa, String idDoc){
+       String conec = MadreDAO.conexionDB("adn","Pzs5wlrd_", "adn");
+        if(!conec.equals("ok")){
+            return "Error de conexion";
+        }
+        Object[][] result =new Object[1][1];
+        
+        try{
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"DO-02", idDoc+"@#");
       
             if(Utils.validaResult(result)){
           
@@ -456,7 +482,7 @@ public class Madre {
         Object[][] result =new Object[1][1];
         
         try{
-            result = MadreDAO.funcionSQLBD(idEmpresa ,"MF-01", filtro+"@#"+idSistema+"@#");
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"CON_CLI", filtro+"@#"+idSistema+"@#");
       
             if(Utils.validaResult(result)){
           
@@ -488,7 +514,7 @@ public class Madre {
         Object[][] result =new Object[1][1];
         
         try{
-            result = MadreDAO.funcionSQLBD(idEmpresa ,"MF-02", 
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"MF-01", 
                     idSistema+"@#"+codTdoc+"@#"+codCliente+"@#"+codCcosto+"@#"+idbodega+"@#"+idVendedor+"@#"+idlprecios+"@#");
       
             if(Utils.validaResult(result)){
@@ -511,7 +537,7 @@ public class Madre {
         Object[][] result =new Object[1][1];
         
         try{
-            result = MadreDAO.funcionSQLBD(idEmpresa ,"MF-03", idArticlo+"@#"+bodega+"@#"+idLista+"@#");
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"MF-02", idArticlo+"@#"+bodega+"@#"+idLista+"@#");
       
             if(Utils.validaResult(result)){
           
@@ -525,7 +551,14 @@ public class Madre {
         }  
    }
    
-   public static String saveFactura(String idEmpresa,String idSistema,String encabezado,String articulos){
+   public static String billDataValidation(
+           String idEmpresa,
+           String idSistema,
+           String codTdoc,
+           String codCcosto,
+           String idVendedor
+           )
+   {
         String conec = MadreDAO.conexionDB("adn","Pzs5wlrd_", "adn");
         if(!conec.equals("ok")){
             return "Error de conexion";
@@ -533,17 +566,41 @@ public class Madre {
         Object[][] result =new Object[1][1];
         
         try{
-            result = MadreDAO.funcionSQLBD(idEmpresa ,"MF-04", idSistema+"@#"+encabezado+"@#"+articulos+"@#");
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"MR-01", 
+                    idSistema+"@#"+codTdoc+"@#"+codCcosto+"@#"+idVendedor+"@#");
       
             if(Utils.validaResult(result)){
           
-                return Utils.arrayToChain(result);
+                return Utils.arrayToChain(result); 
           
             }else{
                 return "Error al procesar consulta de usuarios.@#";
             }
         }catch(Exception e){
             return "Error en cosulta de clientes.@#";
+        }  
+   }
+   
+   public static String getBillDocuments(String idEmpresa, String idTercero ){
+        String conec = MadreDAO.conexionDB("adn","Pzs5wlrd_", "adn");
+        if(!conec.equals("ok")){
+            return "Error de conexion";
+        }
+        Object[][] result =new Object[1][1];
+        
+        try{
+            result = MadreDAO.funcionSQLBD(idEmpresa ,"MR-02", idTercero+"@#");
+      
+            if(result[0][0].toString().indexOf("Error")>0){
+                return "Error al procesar consulta de Documentos.@#";
+            }else if(result[0][0].equals("")){
+                return "No hay registros@#";
+            }else{
+                return Utils.arrayToChain(result);
+            }
+            
+        }catch(Exception e){
+            return "Error en cosulta de Documentos.@#";
         }  
    }
 }
