@@ -4,7 +4,11 @@
  */
 package javadocs;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.*;
+import java.util.Properties;
 
 /**
  *
@@ -15,6 +19,18 @@ public class MadreDAO {
 
   public static String conexionDB(String user, String pwd, String db){
     String result="";
+    String bdAddress = "192.168.10.14:1521";
+     try{
+            Properties dbProp = new Properties();
+            dbProp.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("configDB.properties"));  
+
+            bdAddress = dbProp.getProperty("dataBaseAddress");
+            
+            System.out.println("Se cargo correctamente la direccion"+bdAddress );     
+        }catch(Exception e){
+            System.out.println("No fue posible cargar la direccion de la base de datos");
+            e.printStackTrace();
+        }
 
     try {
         Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -26,7 +42,7 @@ public class MadreDAO {
         
         
         conex = DriverManager.getConnection (
-                    "jdbc:oracle:thin:@192.168.10.14:1521:"+db, props);
+                    "jdbc:oracle:thin:@"+bdAddress+":"+db, props);
         if(conex != null){
             System.out.println("WSADNMovil.Conexion a bd "+user+" establecida");
             result= "ok";
@@ -116,7 +132,32 @@ public class MadreDAO {
     
   }
   
-  public static Object[][] funcionEDI(String idEmpresa, String documento){
+  public static Object[][] funcionFACT(String idEmpresa, String documento){
+    Object resultado = "";
+    CallableStatement cs= null;
+    
+    Object[][] res = new Object[1][1];
+
+    //functionCode = dbfunctionality.getFunctionCode(nameFunction);
+    try{
+      cs = conex.prepareCall("{call "+idEmpresa+".CREA_DOCUM.FACT (?)}");
+      cs.registerOutParameter(1, java.sql.Types.VARCHAR);
+      cs.setString(1, documento);
+      cs.execute();
+      
+      res[0][0]= "ok";      
+      return res;
+      
+    }catch(SQLException sqle){
+        res[0][0] = "WSADNMovil.Error funcionEDI: " + sqle.toString();
+        return res;
+    }catch(Exception e){
+        res[0][0] = "WSADNMovil.Error funcionEDI: "+e.toString();
+        return res;
+    }
+    
+  }
+  public static Object[][] funcionBILL(String idEmpresa, String documento){
     Object resultado = "";
     CallableStatement cs= null;
     

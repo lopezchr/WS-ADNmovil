@@ -272,7 +272,7 @@ public class Madre {
         
         try{
             result = MadreDAO.funcionSQLBD(idEmpresa ,"MI-02", codigo+"@#");
-            if(Utils.validaResult(result)){
+            if(Utils.validaResult(result)&&!result[0][0].toString().equals("MAL")){
                 
                 result = MadreDAO.funcionSQLBD(idEmpresa ,"MI-03", codigo+"@#");
                 
@@ -425,7 +425,7 @@ public class Madre {
         }  
    }
    
-   public static String setDocument(String idEmpresa, String documento, String ideDoc){
+   public static String setFactDocument(String idEmpresa, String documento, String ideDoc){
        String conec = MadreDAO.conexionDB("adn","Pzs5wlrd_", "adn");
         if(!conec.equals("ok")){
             return "Error de conexion";
@@ -434,11 +434,38 @@ public class Madre {
         
         try{
             //result = MadreDAO.funcionSQLBD(idEmpresa ,"DO-01", documento+"@#");
-            result = MadreDAO.funcionEDI(idEmpresa,documento);
+            result = MadreDAO.funcionFACT(idEmpresa,documento);
             
             if(Utils.validaResult(result)){
                 if(result[0][0].toString().indexOf("Error") < 1){
-                    Object[][] obj = MadreDAO.consultarBD("SELECT OBSER LIN FROM "+idEmpresa+".TMP_MOVIL_CONSULTAS WHERE ID_REGISTRO="+ideDoc+"");
+                    Object[][] obj = MadreDAO.consultarBD("SELECT OBSER FROM "+idEmpresa+".TMP_MOVIL_CONSULTAS WHERE ID_REGISTRO='"+ideDoc+"'");
+                    return Utils.arrayToChain(obj);
+                    //return Madre.verifyDocument(idEmpresa,ideDoc);
+                }else{
+                    return "error en la durante el envio del documento";
+                }      
+            }else{
+                return "Error al validar respuesta del procedimiento DB.@#";
+            }   
+        }catch(Exception e){
+            return "Error durante la generacion del documento: "+e.toString()+"@#";
+        }  
+   }
+   
+   public static String setBillDocument(String idEmpresa, String documento, String ideDoc){
+       String conec = MadreDAO.conexionDB("adn","Pzs5wlrd_", "adn");
+        if(!conec.equals("ok")){
+            return "Error de conexion";
+        }
+        Object[][] result =new Object[1][1];
+        
+        try{
+            //result = MadreDAO.funcionSQLBD(idEmpresa ,"DO-01", documento+"@#");
+            result = MadreDAO.funcionBILL(idEmpresa,documento);
+            
+            if(Utils.validaResult(result)){
+                if(result[0][0].toString().indexOf("Error") < 1){
+                    Object[][] obj = MadreDAO.consultarBD("SELECT OBSER FROM "+idEmpresa+".TMP_MOVIL_CONSULTAS WHERE ID_REGISTRO='"+ideDoc+"'");
                     return Utils.arrayToChain(obj);
                     //return Madre.verifyDocument(idEmpresa,ideDoc);
                 }else{
